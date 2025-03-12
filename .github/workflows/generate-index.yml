@@ -1,0 +1,30 @@
+name: Generate .index file
+
+on:
+  push:
+    branches:
+      - main  # Change this to your default branch if needed
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  generate-index:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Generate .index File
+        run: |
+          FILE_INDEX=".index"
+          echo "{\"webp_files\": [" > $FILE_INDEX
+          find . -type f -name "*.webp" | jq -R -s -c 'split("\n")[:-1]' >> $FILE_INDEX
+          echo "]}" >> $FILE_INDEX
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add .index
+          git diff --staged --quiet || (git commit -m "Update .index file" && git push)
