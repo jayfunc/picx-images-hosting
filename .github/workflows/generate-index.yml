@@ -18,9 +18,7 @@ jobs:
       - name: Generate .index File
         run: |
           FILE_INDEX=".index"
-          echo "{\"webp_files\": [" > $FILE_INDEX
-          find . -type f -name "*.webp" | jq -R -s -c 'split("\n")[:-1]' >> $FILE_INDEX
-          echo "]}" >> $FILE_INDEX
+          find . -type f -name "*.webp" | sed 's|./||' | jq -R -s -c 'split("\n")[:-1]' > $FILE_INDEX
 
       - name: Commit and Push Changes
         run: |
